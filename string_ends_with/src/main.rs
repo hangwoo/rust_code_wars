@@ -15,6 +15,13 @@ mod tests {
         assert_eq!(false, solution2("strawberry", "banana"));
         assert_eq!(false, solution2("banana", "strawberry"));
     }
+
+    #[test]
+    fn returns_expected3() {
+        assert_eq!(true, solution3("abc", "c"));
+        assert_eq!(false, solution3("strawberry", "banana"));
+        assert_eq!(false, solution3("banana", "strawberry"));
+    }
 }
 
 pub fn solution(word: &str, ending: &str) -> bool {
@@ -39,6 +46,10 @@ pub fn solution2(word: &str, ending: &str) -> bool {
     }
 
     &word[word.len() - ending.len() ..] == ending
+}
+
+pub fn solution3(word: &str, ending: &str) -> bool {
+    word.ends_with(ending)
 }
 
 fn main() {
