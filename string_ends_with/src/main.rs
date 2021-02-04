@@ -1,12 +1,19 @@
 #[cfg(test)]
 mod tests {
-    use crate::solution;
+    use crate::*;
 
     #[test]
     fn returns_expected() {
         assert_eq!(true, solution("abc", "c"));
         assert_eq!(false, solution("strawberry", "banana"));
         assert_eq!(false, solution("banana", "strawberry"));
+    }
+
+    #[test]
+    fn returns_expected2() {
+        assert_eq!(true, solution2("abc", "c"));
+        assert_eq!(false, solution2("strawberry", "banana"));
+        assert_eq!(false, solution2("banana", "strawberry"));
     }
 }
 
@@ -24,6 +31,14 @@ pub fn solution(word: &str, ending: &str) -> bool {
     }
 
     false
+}
+
+pub fn solution2(word: &str, ending: &str) -> bool {
+    if word.len() < ending.len() {
+        return false;
+    }
+
+    &word[word.len() - ending.len() ..] == ending
 }
 
 fn main() {
