@@ -8,6 +8,13 @@ mod tests {
         assert_eq!(solution("abcdefg"), ["ab", "cd", "ef", "g_"]);
         assert_eq!(solution(""), [] as [&str; 0]);
     }
+
+    #[test]
+    fn basic2() {
+        assert_eq!(solution2("abcdef"), ["ab", "cd", "ef"]);
+        assert_eq!(solution2("abcdefg"), ["ab", "cd", "ef", "g_"]);
+        assert_eq!(solution2(""), [] as [&str; 0]);
+    }
 }
 
 fn solution(s: &str) -> Vec<String> {
@@ -38,6 +45,19 @@ fn solution(s: &str) -> Vec<String> {
     }
     result.reverse();
     result
+}
+
+fn solution2(s: &str) -> Vec<String> {
+    let str = if s.len() % 2 != 0 {
+        format!("{}_", s)
+    } else {
+        String::from(s)
+    };
+    str.chars()
+        .collect::<Vec<char>>()
+        .chunks(2)
+        .map(|chunk| chunk.iter().collect::<String>())
+        .collect::<Vec<String>>()
 }
 
 fn main() {
