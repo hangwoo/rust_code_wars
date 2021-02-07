@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use regex::Regex;
 
 #[cfg(test)]
 mod tests {
@@ -51,36 +52,70 @@ Lima:Jan 1.2,Feb 0.9,Mar 0.7,Apr 0.4,May 0.6,Jun 1.8,Jul 4.4,Aug 3.1,Sep 3.3,Oct
 
     #[test]
     fn basic_tests() {
-        // let da_ta = &da_ta();
-        // assert_fuzzy_mean("London", da_ta, 51.199999999999996);
-        // assert_fuzzy_mean("Beijing", da_ta, 52.416666666666664);
-        // assert_fuzzy_var("London", da_ta, 57.42833333333374);
-        // assert_fuzzy_var("Beijing", da_ta, 4808.37138888889);
-        parse_data(&da_ta());
+        let da_ta = &da_ta();
+        assert_fuzzy_mean("London", da_ta, 51.199999999999996);
+        assert_fuzzy_mean("Beijing", da_ta, 52.416666666666664);
+        assert_fuzzy_var("London", da_ta, 57.42833333333374);
+        assert_fuzzy_var("Beijing", da_ta, 4808.37138888889);
     }
 }
 
-fn parse_data(data: &str) -> HashMap<&str, &str> {
+fn std_mean(data: &[f64]) -> Option<f64> {
+    let sum = data.iter().sum::<f64>();
+    let count = data.len();
+
+    match count {
+        positive if positive > 0 => Some(sum / count as f64),
+        _ => None,
+    }
+}
+
+fn std_variance(data: &[f64]) -> Option<f64> {
+    match (std_mean(data), data.len()) {
+        (Some(data_mean), count) if count > 0 => {
+            let variance = data.iter().map(|value| {
+                let diff = data_mean - (*value);
+
+                diff * diff
+            }).sum::<f64>() / count as f64;
+
+            Some(variance)
+        },
+        _ => None
+    }
+}
+
+fn parse_data(data: &str) -> HashMap<&str, Vec<f64>> {
+    let rx = Regex::new(r"\w+ ").unwrap();
     let s = data
         .split("\n")
         .filter(|&data| data.len() > 0);
     let mut hash = HashMap::new();
     for line in s {
         let split_line = line.split(":").collect::<Vec<_>>();
-        hash.insert(split_line[0], split_line[1]);
+        if split_line.len() == 2 {
+            let monthly_rainfall_value = split_line[1]
+                .split(",")
+                .map(|x| rx.replace_all(x, "").parse::<f64>().unwrap())
+                .collect::<Vec<_>>();
+            hash.insert(split_line[0], monthly_rainfall_value);
+        }
     }
-    println!("{:?}", hash);
     hash
 }
 
 fn mean(town: &str, strng: &str) -> f64 {
-    // your code
-    0.1
+    return match parse_data(strng).get(town) {
+        Some(vec) => std_mean(vec).unwrap(),
+        None => -1.0
+    }
 }
 
 fn variance(town: &str, strng: &str) -> f64 {
-    // your code
-    0.1
+    return match parse_data(strng).get(town) {
+        Some(vec) => std_variance(vec).unwrap(),
+        None => -1.0
+    }
 }
 
 fn main() {
